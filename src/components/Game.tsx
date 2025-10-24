@@ -18,6 +18,17 @@ export const Game: React.FC<GameProps> = ({ onScoreUpdate, onGameOver }) => {
   const gameStateRef = useRef<GameStateManager>(new GameStateManager());
   const [isInitialized, setIsInitialized] = useState(false);
 
+  const handleFruitMerge = (fruit1: any, fruit2: any, newFruit: any) => {
+    // 과일 합치기 로직은 CollisionHandler에서 처리됨
+    console.log('Fruits merged!');
+  };
+
+  const handleScoreUpdate = (points: number) => {
+    gameStateRef.current.dispatch({ type: 'UPDATE_SCORE', payload: points });
+    const currentScore = gameStateRef.current.getScore();
+    onScoreUpdate(currentScore);
+  };
+
   useEffect(() => {
     if (!canvasRef.current) return;
 
@@ -46,17 +57,6 @@ export const Game: React.FC<GameProps> = ({ onScoreUpdate, onGameOver }) => {
       physicsEngine.cleanup();
     };
   }, []);
-
-  const handleFruitMerge = (fruit1: any, fruit2: any, newFruit: any) => {
-    // 과일 합치기 로직은 CollisionHandler에서 처리됨
-    console.log('Fruits merged!');
-  };
-
-  const handleScoreUpdate = (points: number) => {
-    gameStateRef.current.dispatch({ type: 'UPDATE_SCORE', payload: points });
-    const currentScore = gameStateRef.current.getScore();
-    onScoreUpdate(currentScore);
-  };
 
   const handleCanvasClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
     if (!isInitialized || !fruitGeneratorRef.current) return;
