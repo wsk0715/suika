@@ -7,6 +7,7 @@ export class PhysicsEngine {
   private world: Matter.World;
   private canvas: HTMLCanvasElement;
   private runner: Matter.Runner;
+  private collisionHandler: any = null;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -109,6 +110,10 @@ export class PhysicsEngine {
 
   public getEngine() {
     return this.engine;
+  }
+
+  public setCollisionHandler(handler: any) {
+    this.collisionHandler = handler;
   }
 
   public cleanup() {

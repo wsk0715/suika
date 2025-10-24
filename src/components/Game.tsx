@@ -47,6 +47,9 @@ export const Game: React.FC<GameProps> = ({ onScoreUpdate, onGameOver }) => {
       handleScoreUpdate
     );
     collisionHandlerRef.current = collisionHandler;
+    
+    // PhysicsEngine에 CollisionHandler 연결
+    physicsEngine.setCollisionHandler(collisionHandler);
 
     // 게임 시작
     gameStateRef.current.dispatch({ type: 'START_GAME' });
