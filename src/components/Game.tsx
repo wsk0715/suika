@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
+import Matter from 'matter-js';
 import { PhysicsEngine } from '../utils/physics';
 import { FruitGenerator } from '../utils/fruitGenerator';
-import { CollisionHandler } from '../utils/collisionHandler';
 import { GameStateManager } from '../utils/gameState';
-import { GAME_CONFIG } from '../constants/fruits';
+import { GAME_CONFIG, FRUITS } from '../constants/fruits';
 
 interface GameProps {
   onScoreUpdate: (score: number) => void;
@@ -29,6 +29,26 @@ export const Game: React.FC<GameProps> = ({ onScoreUpdate, onGameOver }) => {
     onScoreUpdate(currentScore);
   };
 
+  const mergeFruits = (fruit1: Matter.Body, fruit2: Matter.Body, nextFruitId: number) => {
+    // 두 과일의 중간 위치 계산
+    const x = (fruit1.position.x + fruit2.position.x) / 2;
+    const y = (fruit1.position.y + fruit2.position.y) / 2;
+    
+    // 기존 과일들 제거
+    Matter.World.remove(physicsEngineRef.current!.getWorld(), [fruit1, fruit2]);
+    
+    // 새로운 과일 생성
+    const newFruit = fruitGeneratorRef.current!.createFruit(x, y, nextFruitId);
+    
+    // 점수 업데이트
+    const newFruitData = FRUITS.find(f => f.id === nextFruitId);
+    if (newFruitData) {
+      handleScoreUpdate(newFruitData.points);
+    }
+    
+    console.log('과일 합치기 완료!', nextFruitId);
+  };
+
   useEffect(() => {
     if (!canvasRef.current) return;
 
@@ -40,16 +60,31 @@ export const Game: React.FC<GameProps> = ({ onScoreUpdate, onGameOver }) => {
     const fruitGenerator = new FruitGenerator(physicsEngine.getWorld());
     fruitGeneratorRef.current = fruitGenerator;
 
-    // 충돌 핸들러 초기화
-    const collisionHandler = new CollisionHandler(
-      physicsEngine.getWorld(),
-      handleFruitMerge,
-      handleScoreUpdate
-    );
-    collisionHandlerRef.current = collisionHandler;
-    
-    // PhysicsEngine에 CollisionHandler 연결
-    physicsEngine.setCollisionHandler(collisionHandler);
+    // 충돌 이벤트 직접 등록
+    Matter.Events.on(physicsEngine.getEngine(), 'collisionStart', (event) => {
+      const pairs = event.pairs;
+      
+      for (let i = 0; i < pairs.length; i++) {
+        const bodyA = pairs[i].bodyA;
+        const bodyB = pairs[i].bodyB;
+        
+        // 둘 다 과일인지 확인
+        if ((bodyA as any).fruitId !== undefined && (bodyB as any).fruitId !== undefined) {
+          const fruit1Id = (bodyA as any).fruitId;
+          const fruit2Id = (bodyB as any).fruitId;
+          
+          // 같은 종류의 과일인지 확인
+          if (fruit1Id === fruit2Id) {
+            console.log('같은 과일 충돌!', fruit1Id);
+            // 다음 단계 과일로 합치기
+            const currentFruit = FRUITS.find(f => f.id === fruit1Id);
+            if (currentFruit && currentFruit.nextFruit !== undefined) {
+              mergeFruits(bodyA, bodyB, currentFruit.nextFruit);
+            }
+          }
+        }
+      }
+    });
 
     // 게임 시작
     gameStateRef.current.dispatch({ type: 'START_GAME' });
