@@ -1,4 +1,4 @@
-import { GameState, GameEvent } from '../types/game';
+import type { GameState, GameEvent } from '../types/game';
 import { GAME_CONFIG } from '../constants/fruits';
 
 export class GameStateManager {

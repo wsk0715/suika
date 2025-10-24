@@ -1,5 +1,5 @@
 import Matter from 'matter-js';
-import { FRUITS } from '../constants/fruits';
+import { FRUITS, type Fruit } from '../constants/fruits';
 
 export class FruitGenerator {
   private world: Matter.World;
