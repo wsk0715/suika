@@ -1,35 +1,47 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState } from 'react';
+import { Game } from './components/Game';
+import { ScoreBoard } from './components/ScoreBoard';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [score, setScore] = useState(0);
+  const [isGameOver, setIsGameOver] = useState(false);
+
+  const handleScoreUpdate = (newScore: number) => {
+    setScore(newScore);
+  };
+
+  const handleGameOver = () => {
+    setIsGameOver(true);
+  };
+
+  const handleRestart = () => {
+    setScore(0);
+    setIsGameOver(false);
+    // 게임 재시작을 위해 페이지 새로고침
+    window.location.reload();
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="app">
+      <header className="app-header">
+        <h1>🍉 수박 게임</h1>
+      </header>
+      
+      <main className="app-main">
+        <ScoreBoard 
+          score={score}
+          isGameOver={isGameOver}
+          onRestart={handleRestart}
+        />
+        
+        <Game 
+          onScoreUpdate={handleScoreUpdate}
+          onGameOver={handleGameOver}
+        />
+      </main>
+    </div>
+  );
 }
 
-export default App
+export default App;
