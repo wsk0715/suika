@@ -20,13 +20,20 @@ export class CollisionHandler {
   private setupCollisionDetection() {
     Matter.Events.on(this.world, 'collisionStart', (event) => {
       const pairs = event.pairs;
+      console.log('충돌 이벤트 발생!', pairs.length, '개 쌍');
       
       for (let i = 0; i < pairs.length; i++) {
         const bodyA = pairs[i].bodyA;
         const bodyB = pairs[i].bodyB;
         
+        console.log('충돌 체크:', {
+          bodyA: { isFruit: this.isFruit(bodyA), fruitId: (bodyA as any).fruitId },
+          bodyB: { isFruit: this.isFruit(bodyB), fruitId: (bodyB as any).fruitId }
+        });
+        
         // 둘 다 과일인지 확인
         if (this.isFruit(bodyA) && this.isFruit(bodyB)) {
+          console.log('과일끼리 충돌!', (bodyA as any).fruitId, 'vs', (bodyB as any).fruitId);
           this.handleFruitCollision(bodyA, bodyB);
         }
       }

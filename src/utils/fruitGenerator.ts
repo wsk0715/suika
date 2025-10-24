@@ -32,6 +32,7 @@ export class FruitGenerator {
     (body as any).fruitId = fruitId;
     (body as any).fruitData = fruit;
 
+    console.log('과일 생성:', { fruitId, name: fruit.name, position: { x, y } });
     Matter.World.add(this.world, body);
     return body;
   }
